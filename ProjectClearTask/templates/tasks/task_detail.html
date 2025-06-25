@@ -1,0 +1,68 @@
+{% extends "based/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ task.title }} | Завдання{% endblock %}
+
+{% block content %}
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h2 class="mb-3">{{ task.title }}</h2>
+      <p><strong>👤 Автор:</strong> {{ task.author }}</p>
+      <p><strong>📝 Опис:</strong> {{ task.description }}</p>
+      <p><strong>📌 Статус:</strong> {{ task.get_status_display }}</p>
+      <p><strong>⚡ Пріоритет:</strong> {{ task.get_priority_display }}</p>
+      <p><strong>📅 Термін:</strong> {{ task.due_date }}</p>
+
+      <div class="mt-3">
+        <a href="{% url 'task-edit' task.pk %}" class="btn btn-warning btn-sm">✏️ Редагувати</a>
+        <a href="{% url 'task-delete' task.pk %}" class="btn btn-danger btn-sm">🗑️ Видалити</a>
+        <a href="{% url 'task-list' %}" class="btn btn-secondary btn-sm">⬅ Назад</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <h4>💬 Коментарі:</h4>
+    {% if task.comments.all %}
+      <ul class="list-group mb-3">
+        {% for comment in task.comments.all %}
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div>
+              <strong>{{ comment.author.username }}</strong>
+              <small class="text-muted"> — {{ comment.created_at|date:"d.m.Y H:i" }}</small>
+              <p class="mb-0 mt-1 text-dark">{{ comment.text|linebreaks }}</p>
+            </div>
+          
+            {% if user == comment.author or user.is_staff %}
+              <form method="post" action="{% url 'delete-comment' comment.pk %}" style="margin-left: 10px;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm" title="Видалити">
+                  🗑️
+                </button>
+              </form>
+            {% endif %}
+          </li>          
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>Поки що немає коментарів.</p>
+    {% endif %}
+  </div>
+
+  {% if user.is_authenticated %}
+    <div class="card shadow-sm mt-4">
+      <div class="card-body">
+        <h5 class="mb-3">🖊️ Додати коментар:</h5>
+        <form method="post" action="{% url 'add-comment' task.pk %}">
+          {% csrf_token %}
+          {{ comment_form|crispy }}
+          <button type="submit" class="btn btn-primary btn-sm">💬 Надіслати</button>
+        </form>
+      </div>
+    </div>
+  {% else %}
+    <div class="alert alert-info mt-4">
+      <a href="{% url 'login' %}">Увійдіть</a>, щоб залишити коментар.
+    </div>
+  {% endif %}
+{% endblock %}

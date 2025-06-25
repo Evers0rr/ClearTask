@@ -1,0 +1,80 @@
+{% extends "based/base.html" %}
+{% block title %}Список завдань{% endblock %}
+
+{% block content %}
+<h2>Завдання</h2>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <label for="statusFilter" class="form-label">Статус:</label>
+    <select id="statusFilter" class="form-select">
+      <option value="all" {% if selected_status == "all" %}selected{% endif %}>Усі</option>
+      <option value="todo" {% if selected_status == "todo" %}selected{% endif %}>Очікує</option>
+      <option value="in_progress" {% if selected_status == "in_progress" %}selected{% endif %}>Виконується</option>
+      <option value="done" {% if selected_status == "done" %}selected{% endif %}>Завершено</option>
+    </select>
+  </div>
+  <div class="col-md-4">
+    <label for="priorityFilter" class="form-label">Пріоритет:</label>
+    <select id="priorityFilter" class="form-select">
+      <option value="all" {% if selected_priority == "all" %}selected{% endif %}>Усі</option>
+      <option value="L" {% if selected_priority == "L" %}selected{% endif %}>Низький</option>
+      <option value="M" {% if selected_priority == "M" %}selected{% endif %}>Середній</option>
+      <option value="H" {% if selected_priority == "H" %}selected{% endif %}>Високий</option>
+    </select>
+  </div>
+  <div class="col-md-4 d-flex align-items-end">
+    <button id="resetFilters" class="btn btn-outline-secondary w-100">Скинути фільтри</button>
+  </div>
+</div>
+
+{% if tasks %}
+  <div class="list-group" id="taskList">
+    {% for task in tasks %}
+      <a href="{% url 'task-detail' task.pk %}"
+         class="list-group-item list-group-item-action d-flex justify-content-between align-items-center task-card"
+         data-status="{{ task.status }}"
+         data-priority="{{ task.priority }}">
+        <div>
+          <strong>{{ task.title }}</strong> <br>
+          <small class="text-muted">
+            Пріоритет: {{ task.get_priority_display }} | Статус: {{ task.get_status_display }}<br>
+            Автор: {{ task.author }}
+          </small>
+        </div>
+        <span class="badge bg-primary rounded-pill">{{ task.due_date }}</span>
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>Наразі немає жодного завдання. <a href="{% url 'task-create' %}">Створіть нове</a>.</p>
+{% endif %}
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const statusFilter = document.getElementById("statusFilter");
+    const priorityFilter = document.getElementById("priorityFilter");
+    const resetBtn = document.getElementById("resetFilters");
+
+    function updateURL() {
+      const status = statusFilter.value;
+      const priority = priorityFilter.value;
+
+      const params = new URLSearchParams();
+
+      if (status !== "all") params.set("status", status);
+      if (priority !== "all") params.set("priority", priority);
+
+      const newURL = `${window.location.pathname}?${params.toString()}`;
+      window.location.href = newURL;
+    }
+
+    statusFilter.addEventListener("change", updateURL);
+    priorityFilter.addEventListener("change", updateURL);
+    resetBtn.addEventListener("click", () => {
+      window.location.href = window.location.pathname;
+    });
+  });
+</script>
+
+{% endblock %}

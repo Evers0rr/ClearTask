@@ -1,0 +1,20 @@
+{% extends "based/base.html" %}
+
+{% block title %}Підтвердження видалення{% endblock %}
+
+{% block content %}
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h2 class="mb-3 text-danger">❗ Ви впевнені, що хочете видалити це завдання?</h2>
+      <p><strong>Назва:</strong> {{ object.title }}</p>
+      <p><strong>Опис:</strong> {{ object.description }}</p>
+      <p><strong>Термін:</strong> {{ object.due_date }}</p>
+
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">🗑️ Так, видалити</button>
+        <a href="{% url 'task-detail' object.pk %}" class="btn btn-secondary">⬅ Скасувати</a>
+      </form>
+    </div>
+  </div>
+{% endblock %}

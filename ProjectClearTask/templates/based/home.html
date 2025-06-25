@@ -1,0 +1,17 @@
+{% extends "based/base.html" %}
+
+{% block title %}Головна | ClearTask{% endblock %}
+
+{% block content %}
+  <div class="text-center">
+    <h1 class="display-4 mb-4">🎯 ClearTask</h1>
+    <p class="lead">Завдання для себе і команди. Працюй продуктивно.</p>
+    <hr>
+    {% if user.is_authenticated %}
+      <a class="btn btn-primary btn-lg" href="{% url 'task-list' %}">Перейти до завдань</a>
+    {% else %}
+      <p>!!!Для того щоб перейти до завдань, треба <a class="link" href="{% url 'register' %}">зареєструватися</a> або <a class="link" href="{% url 'login' %}">увійти</a>!!!</p>
+    {% endif %}
+  </div>
+{% endblock %}
+

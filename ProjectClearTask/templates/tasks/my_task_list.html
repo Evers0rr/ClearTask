@@ -1,0 +1,59 @@
+{% extends "based/base.html" %}
+{% block title %}Мої завдання{% endblock %}
+
+{% block content %}
+<h2>Мої завдання</h2>
+
+<form method="get" id="filterForm" class="row g-3 mb-4">
+  <div class="col-md-3">
+    <label for="status" class="form-label">Статус:</label>
+    <select name="status" id="status" class="form-select">
+      <option value="all" {% if selected_status == 'all' %}selected{% endif %}>Усі</option>
+      <option value="todo" {% if selected_status == 'todo' %}selected{% endif %}>To do</option>
+      <option value="in_progress" {% if selected_status == 'in_progress' %}selected{% endif %}>In progress</option>
+      <option value="done" {% if selected_status == 'done' %}selected{% endif %}>Done</option>
+    </select>
+  </div>
+
+  <div class="col-md-3">
+    <label for="priority" class="form-label">Пріоритет:</label>
+    <select name="priority" id="priority" class="form-select">
+      <option value="all" {% if selected_priority == 'all' %}selected{% endif %}>Усі</option>
+      <option value="H" {% if selected_priority == 'H' %}selected{% endif %}>High</option>
+      <option value="M" {% if selected_priority == 'M' %}selected{% endif %}>Medium</option>
+      <option value="L" {% if selected_priority == 'L' %}selected{% endif %}>Low</option>
+    </select>
+  </div>
+
+  <div class="col-md-3 d-flex align-items-end">
+    <a href="{% url 'my-tasks' %}" class="btn btn-outline-secondary w-100">Скинути фільтр</a>
+  </div>
+</form>
+
+{% if tasks %}
+  <div class="list-group">
+    {% for task in tasks %}
+      <a href="{% url 'task-detail' task.pk %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+        <div>
+          <strong>{{ task.title }}</strong><br>
+          <small class="text-muted">
+            Пріоритет: {{ task.get_priority_display }} | Статус: {{ task.get_status_display }}
+          </small>
+        </div>
+        <span class="badge bg-primary rounded-pill">{{ task.due_date }}</span>
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>Завдань не знайдено.</p>
+{% endif %}
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("filterForm");
+    document.getElementById("status").addEventListener("change", () => form.submit());
+    document.getElementById("priority").addEventListener("change", () => form.submit());
+  });
+</script>
+{% endblock %}
+
