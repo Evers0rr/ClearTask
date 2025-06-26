@@ -104,7 +104,8 @@ class TaskUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def test_func(self):
         task = self.get_object()
-        return self.request.user == task.author
+        return self.request.user == task.author or self.request.user.is_staff
+
 
 class TaskDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Task
@@ -113,8 +114,7 @@ class TaskDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def test_func(self):
         task = self.get_object()
-        return self.request.user == task.author
-    
+        return self.request.user == task.author or self.request.user.is_staff
 
 class TaskDetailView(LoginRequiredMixin, DetailView):
     model = Task
